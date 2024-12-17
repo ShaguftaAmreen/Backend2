@@ -79,7 +79,9 @@ const token=jwt.sign({
     email:existingUser.verified,
     verfied:existingUser.verified
 },
-process.env.TOKEN_SECRET
+process.env.TOKEN_SECRET,{
+    expiresIn:"8h"
+}
 );
 res.cookie("Authorization","Bearer "+token,{expires:new Date(Date.now() +8* 3600000),
     httpOnly:process.env.NODE_ENV === "Production",
@@ -93,4 +95,36 @@ res.cookie("Authorization","Bearer "+token,{expires:new Date(Date.now() +8* 3600
     catch(error){
         console.log(error)
     }
+}
+
+
+/*****************************************************/
+
+exports.signout=async (req,res)=>{
+    res.clearCookie("Authorization").status(200)
+    .json({success:true,message:"Logged out successfully"})
+}
+
+/*****************************************************/
+
+exports.sendVerificationCode=async (req,res)=>{
+    const {email}=req.body;
+try{
+  const existingUser=await User.findOne({email})
+  if(!existingUser){
+    return res
+    .status(401)
+    .json({success:false,message:"User does not exists!"});
+  }
+  if(existingUser.verfied){
+    return res
+    .status(400)
+    .json({success:false,message:"You are already verified!"});
+  }
+  const codeValue=Math.floor(Math.random*1000000)
+  .toString();
+}
+catch(error){
+    console.log(error);
+}
 }
