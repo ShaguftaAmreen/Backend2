@@ -16,7 +16,7 @@ exports.identifier=async(req,res,next)=>{
      const jwtVerified=await jwt.verify(userToken,process.env.TOKEN_SECRET);
       if(jwtVerified){
         req.user=jwtVerified;
-        next()
+        next();
       }
       else{
         throw new Error("Error in the token")

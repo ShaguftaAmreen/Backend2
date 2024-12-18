@@ -66,6 +66,13 @@ exports.signin=async(req,res)=>{
         .json({ success: false, message: error.details[0].message }); 
      }
      const existingUser=await User.findOne({email}).select('+password')
+
+/*In Mongoose, when you define a schema, you can specify which fields 
+should be included or excluded when retrieving documents from the database.
+The .select('+password') is used in this case to include the password field, 
+which is usually excluded by default from the query results for security reasons.
+Here’s why .select('+password') is needed:*/
+
      if(!existingUser){
         return res
         .status(401)

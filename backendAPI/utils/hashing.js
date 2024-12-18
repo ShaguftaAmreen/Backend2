@@ -1,6 +1,6 @@
-const {hash,compare}=require("bcryptjs")
+const {hash,compare}=require("bcryptjs");
 const bcrypt = require("bcrypt");
-const {createHmac}=require("crypto")
+const {createHmac}=require("crypto");
 
 exports.doHash=(value,saltValue)=>{
     const result=hash(value,saltValue);
