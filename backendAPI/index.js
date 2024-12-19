@@ -17,6 +17,7 @@ mongoose
   });
 
 const authRouter = require("./routers/authRouter");
+const postsRouter = require("./routers/postsRouter");
 
 app.use(cors());
 app.use(helmet());//The helmet package in Node.js is a security middleware for Express applications.
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));//express.urlencoded helps Expre
                                                //It turns the form data into an easy-to-use object.
 
 app.use("/api/auth", authRouter);
+app.use("/api/posts",postsRouter)
 
 app.get("/", (req, res) => {
   res.json({ message: "Hello from the server." });
