@@ -1,0 +1,267 @@
+*****************
+
+project/
+│
+├── config/                # Configuration files
+│   └── db.js              # Database connection file
+│
+├── models/                # Mongoose schemas
+│   └── User.js            # User schema
+│
+├── routes/                # Express route files
+│   └── authRoutes.js      # Authentication routes
+│
+├── controllers/           # Route logic (controllers)
+│   └── authController.js  # Auth-related logic
+│
+├── middleware/            # Custom middleware
+│   └── authMiddleware.js  # Token verification middleware
+│
+├── .env                   # Environment variables
+├── package.json           # Dependencies
+├── server.js              # Main server file
+
+*************************
+
+npm install express jsonwebtoken dotenv mongoose bcryptjs
+
+*************************
+
+config/db.js
+
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB connected successfully');
+  } catch (err) {
+    console.error('MongoDB connection error:', err.message);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+
+***************************
+
+models/User.js
+
+const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
+});
+
+module.exports = mongoose.model('User', userSchema);
+
+
+***************************
+
+middleware/authMiddleware.js
+
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+const authMiddleware = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token is missing, access denied' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Add decoded user data to the request object
+    next();
+  } catch (err) {
+    res.status(403).json({ message: 'Invalid or expired token' });
+  }
+};
+
+module.exports = authMiddleware;
+
+
+**********************
+
+controllers/authController.js
+
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+require('dotenv').config();
+
+// User registration
+exports.register = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user
+    const newUser = new User({ username, email, password: hashedPassword });
+    await newUser.save();
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// User login
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find the user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Generate a token
+    const payload = { id: user._id, username: user.username };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.json({ message: 'Login successful', token });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Protected route
+exports.protectedRoute = (req, res) => {
+  res.json({ message: 'Access granted', user: req.user });
+};
+
+
+******************
+
+routes/authRoutes.js
+
+const express = require('express');
+const { register, login, protectedRoute } = require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware');
+
+const router = express.Router();
+
+// Public routes
+router.post('/register', register);
+router.post('/login', login);
+
+// Protected route
+router.get('/protected', authMiddleware, protectedRoute);
+
+module.exports = router;
+
+
+**********************
+
+server.js
+
+const express = require('express');
+const connectDB = require('./config/db');
+const authRoutes = require('./routes/authRoutes');
+require('dotenv').config();
+
+// Initialize the app
+const app = express();
+
+// Connect to MongoDB
+connectDB();
+
+// Middleware
+app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
+
+// Server setup
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+
+*********************
+
+.env File
+
+MONGODB_URI=mongodb://localhost:27017/jwt_auth
+JWT_SECRET=your_super_secret_key
+PORT=3000
+
+
+****************
+
+node server.js
+
+*****************
+
+Register a new user:
+
+URL: http://localhost:3000/api/auth/register
+Method: POST
+Body:
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "mypassword"
+}
+
+**********************
+
+Login to get the token:
+
+URL: http://localhost:3000/api/auth/login
+
+Method: POST
+
+Body:
+{
+  "email": "john@example.com",
+  "password": "mypassword"
+}
+
+Response:
+{
+  "message": "Login successful",
+  "token": "your_jwt_token_here"
+}
+
+*****************
+
+Access the protected route:
+
+URL: http://localhost:3000/api/auth/protected
+Method: GET
+Headers:
+Authorization: Bearer your_jwt_token_here
+
+********************
+
+Organized Folder Structure for scalability.
+Database Integration using MongoDB.
+Password Security with bcryptjs.
+JWT Authentication for login and protected routes.
+Middleware for token verification
+

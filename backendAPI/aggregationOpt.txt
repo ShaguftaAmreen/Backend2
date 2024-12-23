@@ -1,0 +1,171 @@
+Sample Data for users Collection:
+json
+Copy code
+[
+  { "_id": 1, "name": "John", "age": 30, "tags": ["newUser", "sale"], "orderAmount": 100 },
+  { "_id": 2, "name": "Alice", "age": 25, "tags": ["newUser", "discount"], "orderAmount": 200 },
+  { "_id": 3, "name": "Bob", "age": 35, "tags": ["sale", "active"], "orderAmount": 300 },
+  { "_id": 4, "name": "Charlie", "age": 28, "tags": ["newUser", "sale", "active"], "orderAmount": 150 },
+  { "_id": 5, "name": "David", "age": 22, "tags": ["newUser"], "orderAmount": 50 }
+]
+
+******************************
+
+$group – Grouping Data
+Example: You want to calculate the total orderAmount for each name (customer).
+
+js
+Copy code
+db.users.aggregate([
+  { 
+    $group: { 
+      _id: "$name", 
+      totalAmount: { $sum: "$orderAmount" }
+    } 
+  }
+])
+Output:
+
+json
+Copy code
+[
+  { "_id": "John", "totalAmount": 100 },
+  { "_id": "Alice", "totalAmount": 200 },
+  { "_id": "Bob", "totalAmount": 300 },
+  { "_id": "Charlie", "totalAmount": 150 },
+  { "_id": "David", "totalAmount": 50 }
+]
+This output groups the users by their name and calculates the total amount spent by each user.
+
+***********************************************
+ $sort – Sorting Data
+Example: You want to sort users by age in descending order.
+
+js
+Copy code
+db.users.aggregate([
+  { $sort: { age: -1 } }
+])
+Output:
+
+json
+Copy code
+[
+  { "_id": 3, "name": "Bob", "age": 35, "tags": ["sale", "active"], "orderAmount": 300 },
+  { "_id": 1, "name": "John", "age": 30, "tags": ["newUser", "sale"], "orderAmount": 100 },
+  { "_id": 4, "name": "Charlie", "age": 28, "tags": ["newUser", "sale", "active"], "orderAmount": 150 },
+  { "_id": 2, "name": "Alice", "age": 25, "tags": ["newUser", "discount"], "orderAmount": 200 },
+  { "_id": 5, "name": "David", "age": 22, "tags": ["newUser"], "orderAmount": 50 }
+]
+This output sorts the users by age in descending order.
+
+******************************************
+
+$match – Filtering Data
+Example: You want to find users older than 25.
+
+js
+Copy code
+db.users.aggregate([
+  { $match: { age: { $gt: 25 } } }
+])
+Output:
+
+json
+Copy code
+[
+  { "_id": 1, "name": "John", "age": 30, "tags": ["newUser", "sale"], "orderAmount": 100 },
+  { "_id": 3, "name": "Bob", "age": 35, "tags": ["sale", "active"], "orderAmount": 300 },
+  { "_id": 4, "name": "Charlie", "age": 28, "tags": ["newUser", "sale", "active"], "orderAmount": 150 }
+]
+This output returns only the users whose age is greater than 25.
+
+***************************************
+
+$project – Selecting Specific Fields
+Example: You want to display only the name and age of users.
+
+js
+Copy code
+db.users.aggregate([
+  { $project: { name: 1, age: 1 } }
+])
+Output:
+
+json
+Copy code
+[
+  { "_id": 1, "name": "John", "age": 30 },
+  { "_id": 2, "name": "Alice", "age": 25 },
+  { "_id": 3, "name": "Bob", "age": 35 },
+  { "_id": 4, "name": "Charlie", "age": 28 },
+  { "_id": 5, "name": "David", "age": 22 }
+]
+This output includes only the name and age fields for each user, and excludes other fields.
+
+*******************************************
+
+5. $limit – Limiting the Number of Documents
+Example: You want to return only the first 3 users.
+
+js
+Copy code
+db.users.aggregate([
+  { $limit: 3 }
+])
+Output:
+
+json
+Copy code
+[
+  { "_id": 1, "name": "John", "age": 30, "tags": ["newUser", "sale"], "orderAmount": 100 },
+  { "_id": 2, "name": "Alice", "age": 25, "tags": ["newUser", "discount"], "orderAmount": 200 },
+  { "_id": 3, "name": "Bob", "age": 35, "tags": ["sale", "active"], "orderAmount": 300 }
+]
+
+***********************************************
+
+$skip – Skipping Documents
+Example: You want to skip the first 2 users and show the rest.
+
+js
+Copy code
+db.users.aggregate([
+  { $skip: 2 }
+])
+Output:
+
+json
+Copy code
+[
+  { "_id": 3, "name": "Bob", "age": 35, "tags": ["sale", "active"], "orderAmount": 300 },
+  { "_id": 4, "name": "Charlie", "age": 28, "tags": ["newUser", "sale", "active"], "orderAmount": 150 },
+  { "_id": 5, "name": "David", "age": 22, "tags": ["newUser"], "orderAmount": 50 }
+]
+This output skips the first 2 users and returns the rest of the documents.
+
+**********************************
+
+db.orders.aggregate([
+  {
+    $addFields: {
+      discountedAmount: { $multiply: ["$orderAmount", 0.8] }  // Applying a 20% discount
+    }
+  },
+  { $sort: { discountedAmount: 1 } }  // Sorting by discounted amount in ascending order
+])
+Explanation:
+
+This adds a new field discountedAmount, calculated as orderAmount * 0.8 (which applies a 20% discount).
+After adding the field, it sorts the orders by the discountedAmount in ascending order.
+Output:
+
+json
+Copy code
+[
+  { "_id": 3, "orderAmount": 300, "discountedAmount": 240 },
+  { "_id": 1, "orderAmount": 100, "discountedAmount": 80 },
+  { "_id": 2, "orderAmount": 200, "discountedAmount": 160 }
+]
+
+***************************************

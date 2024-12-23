@@ -1,0 +1,262 @@
+page    pageNum	    Posts to Skip (skip)	           Posts Displayed (limit: 10)
+Page 1	   0	          0 * 10 = 0	                      Posts 1 to 10
+Page 2	   1	          1 * 10 = 10	                      Posts 11 to 20
+Page 3	   2	          2 * 10 = 20	                      Posts 21 to 30
+Page 4	   3	          3 * 10 = 30	                      Posts 31 to 40
+Page 5	   4	          4 * 10 = 40	                      Posts 41 to 50
+
+////////////////////////////
+
+populate methods
+
+// User Document in database
+
+{
+  "_id": "1",
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "age": 30,
+  "address": "123 Street, City",
+  "phone": "123-456-7890"
+}
+
+
+//result with .populate({path: "userId", select: "email" })
+
+[
+  {
+    "_id": "101",
+    "title": "First Post",
+    "content": "Hello World!",
+    "userId": { "_id": "1", "email": "john.doe@example.com" }
+  }
+]
+
+//result without select
+
+[
+  {
+    "_id": "101",
+    "title": "First Post",
+    "content": "Hello World!",
+    "userId": {
+      "_id": "1",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "age": 30,
+      "address": "123 Street, City",
+      "phone": "123-456-7890"
+    }
+  }
+]
+
+
+//The .populate() method in MongoDB (via Mongoose) is used to fetch related data 
+from another collection based on references. 
+It helps you replace a reference field in one document with the actual data from the referenced document.
+
+/*****************************************/
+
+exports.getPosts = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query; // Default values: page=1, limit=10
+  const pageNum = Math.max(0, page - 1); // Ensure pageNum is at least 0
+
+  try {
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .skip(pageNum * limit) // Skip documents for pagination
+      .limit(Number(limit)) // Limit the number of documents
+      .populate({
+        path: "userId",
+        select: "email",
+      });
+
+    const totalPosts = await Post.countDocuments(); // Total number of posts
+    res.status(200).json({
+      success: true,
+      message: "posts",
+      data: posts,
+      totalPages: Math.ceil(totalPosts / limit),
+      currentPage: Number(page),
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+***********************************
+
+//find :Purpose: Retrieves documents from a collection.
+
+Example:
+
+const posts = await Post.find({ status: "active" });
+console.log(posts);
+
+***********************************
+
+//findOne :
+Purpose: Retrieves a single document that matches the condition.
+
+Example:
+
+const post = await Post.findOne({ _id: "12345" });
+console.log(post);
+
+*************************************
+
+//general 
+
+const publishedPostsCount = await Post.countDocuments({ status: "published" });
+console.log(`Total published posts: ${publishedPostsCount}`);
+
+// sorting and filtering by using aggregate (following is the multi filtering)
+
+const posts = await Post.aggregate([
+    {
+        $match: {
+            status: "active",  // Filter by active posts
+            category: "tech"   // Filter by category
+        }
+    },
+    {
+        $sort: { createdAt: -1 }  // Sort by createdAt in descending order
+    }
+]);
+
+console.log(posts);
+
+************************************
+
+vvvvimp
+
+const express = require("express");
+const mongoose = require("mongoose");
+const Post = require("./models/Post"); // Assuming you have a Post model defined
+const app = express();
+
+// Connect to MongoDB
+mongoose.connect("mongodb://localhost:27017/yourDB", { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch(err => console.error("Could not connect to MongoDB:", err));
+
+// Define the API route
+app.get("/api/posts/active-by-category", async (req, res) => {
+  try {
+    // Perform the aggregation to group by category and count active posts
+    const result = await Post.aggregate([
+      { $match: { status: "active" } }, // Step 1: Filter the documents to include only "active" posts
+      { 
+        $group: { 
+          _id: "$category",  // Group the documents by the "category" field
+          total: { $sum: 1 }  // Count the number of posts in each category
+        } 
+      }
+    ]);
+
+    // Send the result as a response
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    console.error("Error occurred:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+// Start the server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+
+API end point :
+http://localhost:5000/api/posts/active-by-category
+
+output :
+
+{
+  "success": true,
+  "data": [
+    { "_id": "Technology", "total": 10 },
+    { "_id": "Health", "total": 5 },
+    { "_id": "Lifestyle", "total": 8 }
+  ]
+}
+
+
+const mongoose = require("mongoose");
+
+// Define the Post schema
+const postSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["active", "inactive", "draft"],
+    default: "active",
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+// Create a model from the schema
+const Post = mongoose.model("Post", postSchema);
+
+module.exports = Post;
+
+
+//status: The enum ensures that only the specified values ("active", "inactive", "draft")
+ can be assigned to this field.
+
+ ******************************************
+
+ distinct()
+Purpose: Finds distinct values for a field.
+
+Example:
+
+const categories = await Post.distinct("category");
+console.log(categories);
+Explanation: distinct() returns all unique values for the given field, useful for finding 
+all distinct categories, tags, etc.
+
+**********************************************
+
+ sort()
+Purpose: Sorts documents in a specified order.
+
+Example:
+
+const posts = await Post.find().sort({ createdAt: -1 });
+console.log(posts);
+Explanation: sort() is used to order documents based on one or more fields. A value of -1 sorts
+ in descending order, and 1 sorts in ascending order.
+
+*********************************************
+
+skip() and limit()
+Purpose: Used for pagination.
+
+Example:
+
+const posts = await Post.find().skip(10).limit(5);
+console.log(posts);
+
+***********************************************
