@@ -1,0 +1,106 @@
+
+
+//for updating
+
+db.students.updateOne({name:"Ram"},{$set:{idCards:{
+    hasPanCard:false,hasAdhaarCard:true
+}}})
+
+db.students.findOne({name:'Ram'})
+
+//for updating many
+
+db.students.updateMany({},{$set:{hobbies:["Anime","cooking"]}})
+
+//for searching
+
+db.students.find({hobbies:"cooking"});
+
+db.students.find({hobbies:"cooking"}).count();
+
+//searching nested documents
+
+db.students.find({"idCards.hasPanCard":true})
+
+//for finding 
+
+db.students.find({age:11}) //o/p: 2docs //like where in sql
+
+db.students.findOne({age:11}) // o/p:1 doc
+
+//
+db.students.find().count()
+
+db.students.forEach((x)=>{printjson(X)})
+
+db.students.find().limit(2)
+
+//In mongoDb everything we do is in documents
+
+db.students.find({age:{$lt:12}})
+
+//$ sign means following is the reserved key
+
+db.students.find({age:{$gte:12}}).count()
+
+db.students.find({age:{$gt:5,$lt:12}})
+
+//find() gives 20 elements but if want all the use following 
+
+db.students.find().toArray()
+
+//searching using _id
+
+db.students.find({_id:ObjectId("3344fdgv56c67gh6ghh")})
+
+//show dbs
+//use school (if this does not exists then mongodb creates it for us)
+//show collections
+db.students.insertOne({name:"Ram",age:12});
+db.students.insertMany([{name:"Ajay",age:4},{name:'Nitin",age:5}]);
+
+//updateOne And UpdateMany
+
+db.students.updateOne({name:"Vijay"},{$set:{age:15}})
+
+db.students.updateMany({age:12},{$set:{age:13}})
+
+db.students.updateMany({age:13},{$set:{isEligible:flase}})
+//note: isEligible is not present , then mongoDb will add it to the schema
+
+db.students.updateMany({age:{$gte:14},{$set:{isEligible:true}}})
+
+//deleting
+
+db.students.deleteMany({age:13})
+
+db.students.deleteOne({name:"Nitin"})
+
+db.students.deleteMany({})
+
+//db.students.find({}) (it will display all documents)
+
+//for selecting columns || column query in mongoDb
+
+db.students.find({},{name:1})(then it will give only names but by default id will be included , to not include id write the following syntax)
+
+db.students.find({},{name:1,_id:0})
+
+//datatypes
+
+typeof db.companyData.findOne().name
+
+db.companyData.insertOne({name:"Amazon",isFunded:true,funding:8.1213755212121,emloyees:[{name:"Vipul",age:55},{name:"Amit",age:45}],
+foundedOn:new Date(), foundedOnTimestamp: new Timestamp()
+})
+
+//deleting collection
+
+db.products.drop()
+
+//insertig with option
+
+db.books.insertMany([{_id:"a",name:"a",price:1},
+{_id:"b",name:"b",price:2},{_id:"c",name:"c",price:3},
+{_id:"a",name:"d",price:4},{_id:"e",name:"e",price:5}
+],{ordered:false})

@@ -6,9 +6,7 @@ const GetAllItems = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    
-      console.log("hiiiiiiiiiiiii")
-    axios
+     axios
       .get("http://localhost:5000/items/")
       .then((res) => {
         console.log("Fetched data:", res.data);
@@ -17,6 +15,7 @@ const GetAllItems = () => {
       .catch((err) => {
         console.error("Error fetching data:", err);
       });
+
   }, []);
 
   const handleDelete = (id) => {
@@ -52,12 +51,11 @@ const GetAllItems = () => {
                 <button onClick={() => handleDelete(ele._id)}>
                   Delete The Item
                 </button>
-
-              </div>
+                </div>
             );
           })
         ) : (
-          <p>No items available</p>
+          <h3>No items available</h3>
         )}
       </div>
     </div>
@@ -65,3 +63,4 @@ const GetAllItems = () => {
 };
 
 export default GetAllItems;
+
