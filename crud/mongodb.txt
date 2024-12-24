@@ -104,3 +104,8 @@ db.books.insertMany([{_id:"a",name:"a",price:1},
 {_id:"b",name:"b",price:2},{_id:"c",name:"c",price:3},
 {_id:"a",name:"d",price:4},{_id:"e",name:"e",price:5}
 ],{ordered:false})
+
+//write concern 
+
+db.books.insertOne({name:"B,price:2},{writeConcern:{w:0,j:true}})
+

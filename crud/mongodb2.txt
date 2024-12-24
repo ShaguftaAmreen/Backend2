@@ -1,0 +1,192 @@
+//comparision operator
+
+db.students.find({age:{$eq:5}})
+
+db.students.find({age:{$ne:5}})
+
+db.students.find({age:{$gt:5}})
+
+db.students.find({age:{$lt:5}})
+
+db.students.find({age:{$gte:5}})
+
+db.students.find({age:{$lte:5}})
+
+db.students.find({age:{$in:[5,12]}})
+
+//
+[{
+name:"Iffath",
+age:11,
+hobbies:["walk","cricket"],
+indentify:{hasPanCard:false,hasAdhaarCard:true}
+},
+{
+name:"Fatima",
+age:15,
+hobbies:["cricket"],
+indentify:{hasPanCard:false,hasAdhaarCard:false}
+},
+]
+
+//db.students.find({hobbies:"walk"})
+db.students.find({"identity.hasAdhaarCard:true})
+
+//logical operator
+
+db.students.find({$or:[{age:{$lte:10}},{age:{$gte:12}}]})
+
+$nor
+
+$and
+
+db.students.find({$and:[{age:{$lt:11}},{hobbies:"walk"}]})
+
+db.students.find({$and:[{age:{$lt:11}},{age:{$gt:5}}]})
+
+db.students.find({hasMacBook:{$exists:true}})
+
+db.students.find({hasMacBook:{$exists:true,$type:8}})
+
+//Array operator
+
+db.collection('users').find({ age: { $in: [18, 25, 30] } });
+( Finds users whose age is either 18, 25, or 30)
+
+db.collection('users').find({ age: { $nin: [18, 25, 30] } });
+(Finds users whose age is neither 18, 25, nor 30)
+
+db.collection('users').find({ hobbies: { $all: ['reading', 'coding'] } });
+(Finds users who have both "reading" and "coding" in their hobbies array)
+
+db.collection('orders').find({ items: { $elemMatch: { price: { $gt: 100 } } } });
+(Finds orders where at least one item has a price greater than 100)
+
+db.collection('users').find({ hobbies: { $size: 3 } });
+(Finds users who have exactly 3 hobbies)
+
+//string operator
+
+db.collection('users').find({ name: { $regex: /^A/ } });
+(Finds users whose name starts with "A")
+
+db.collection('users').find({ name: { $regex: /^a/, $options: 'i' } });
+( Finds users whose name starts with "a" (case-insensitive))
+
+//$exp operator
+
+
+db.collection.find({
+    $expr:{
+        $gt:["$field1","$field2"]
+    }
+})
+
+ex:
+db.collection.find({
+    $expr: {
+        $gt: ["$price", { $avg: "$price" }]
+    }
+})
+
+//$regex operator
+
+db.students.find({name:{$regex:/^A/}})
+
+//$text and $search operators
+
+db.products.find({
+    $text:{
+        $search:"red shirt"
+    }
+})
+
+//$text and $search
+
+ex:
+db.students.createIndex({bio:"text"})
+
+db.students.find({$text:{$search:"youtuber"}})
+
+//$mod
+
+db.collection.find({
+    quantity:{
+        $mod:[3,0]
+    }
+})
+(when we devide that quantity with zero then it should give 0)
+
+ex2:
+db.students.find({age:{$mod:[2,0]}})
+
+//querying with arrays
+
+[
+    {
+        id:1,
+        name:"Sita",
+        age:12,
+        hobbies:["walk","cricket"],
+        identity:{hasPanCard:false,hasAdhaarCard:true},
+        bio:"I am a youtuber",
+        experience:[
+            {company:"Spotify",durarion:3},
+            {company:"paytm",durarion:1}
+        ]
+
+    }
+]
+
+(
+    //db.students.find({hobbies:'cricket'})
+)
+
+db.students.find({"experience.comapany":"Amazon"})(bring the students)
+
+db.students.find({"experience.comapany":"Amazon"}).size();(how many)
+
+//students who have worked in 3 companies
+
+db.students.find({experience:{$size:3}})
+
+db.students.find({$and:[{experience:{$exists:true}},{$expr:{$gte:[{$size:"$experience},3]}}]})
+
+//students who have hobbies walking and reading 
+
+db.students.find({hobbies:{$all:["walking","reading"]}})
+
+//any 
+
+db.students.find({hobbies:{$in:["walking","reading"]}})
+
+//elemMatch
+db.students.insertMany([
+  { name: "Alice", grades: [{ subject: "Math", score: 95 }, { subject: "Science", score: 85 }] },
+  { name: "Bob", grades: [{ subject: "Math", score: 70 }, { subject: "Science", score: 90 }] },
+  { name: "Charlie", grades: [{ subject: "Math", score: 80 }, { subject: "Science", score: 60 }] }
+]);
+
+Query: Find students who scored more than 80 in Math.
+
+db.students.find({
+  grades: {
+    $elemMatch: {
+      subject: "Math",
+      score: { $gt: 80 }
+    }
+  }
+});
+
+ex2:
+[
+    {
+        id:1,
+        products:[
+            {name:'apple',quantity:10},
+             {name:'orange',quantity:5},
+              {name:'banana',quantity:20},
+        ]
+    }
+]
+db.products.find({products:{$eleMatch:{quantity:{$gt:11},name:"apple"}}})

@@ -1,0 +1,42 @@
+//sorting 
+
+db.teachers.find().sort({age:1})
+(-1 for descending order)
+
+db.teachers.find().sort({age:1,name:1})
+
+//when it gives only 20 element and we want more the use the following 
+
+db.teachers.find().sort({age:1,name:1}).forEach((x)=>printjson(x))
+
+db.teachers.find().sort({age:1,name:1}).skip(20)
+
+//$inc oprerator
+
+db.students.updateMany(
+    {},
+    {$inc:{age:1}}
+)
+
+//using set 
+db.students.updateMany(
+    {},
+    {$set:{age:1}}
+)
+
+//$max and $min
+
+db.students.updateOne({name:"Sita"},{$set:{age:50}})
+db.students.updateOne({name:"Sita"},{$max:{age:50}})
+db.students.updateOne({name:"Sita"},{$min:{age:23}})
+
+//$mul 
+db.students.updateOne({name:"Sita"},{$mul:{age:2}})
+
+//$unset
+
+//$rename
+
+db.students.updateMany({},{$rename:{age:"studentAge"}})
+
+
