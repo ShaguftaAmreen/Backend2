@@ -30,7 +30,7 @@ indentify:{hasPanCard:false,hasAdhaarCard:false}
 ]
 
 //db.students.find({hobbies:"walk"})
-db.students.find({"identity.hasAdhaarCard:true})
+db.students.find({"identity.hasAdhaarCard":true})
 
 //logical operator
 
