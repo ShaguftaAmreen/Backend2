@@ -581,7 +581,7 @@ app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
-Student.find({},{bio:1,name:1,_id:0})
-Student.createIndexes({name:"text",bio:"text"})
-Student.find({$text:{$search:"Youtuber"}})
+// Student.find({},{bio:1,name:1,_id:0})
+// Student.createIndexes({name:"text",bio:"text"})
+// Student.find({$text:{$search:"Youtuber"}})
 
