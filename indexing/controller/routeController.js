@@ -121,7 +121,7 @@ exports.getOneStudent = async (req, res) => {
         // if(students.length===1){
         res.status(200).json({
           success: true,
-          message: (students.length===1) ? "Student found" : "Students found" ,
+          message: students.length===1 ? "Student found!" : "Students found!" ,
           students,
         });
       //  }

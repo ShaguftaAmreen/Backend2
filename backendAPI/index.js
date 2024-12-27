@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));//express.urlencoded helps Expre
                                                //It turns the form data into an easy-to-use object.
 
 app.use("/api/auth", authRouter);
-app.use("/api/posts",postsRouter)
+app.use("/api/posts",postsRouter);
 
 app.get("/", (req, res) => {
   res.json({ message: "Hello from the server." });

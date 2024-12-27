@@ -23,9 +23,16 @@ const studentSchema = new mongoose.Schema({
 
 //studentSchema.index({ age: 1 });
 
-studentSchema.index({ bio: "text", hobbies:"text",skills: "text" });
+studentSchema.index({ bio: "text", hobbies: "text", skills: "text" });
 
 module.exports = mongoose.model("Student", studentSchema);
+
+// You can assign weights to fields to give more importance to one field over another during searches.
+// studentSchema.index(
+//   { bio: "text", hobbies: "text", skills: "text" },
+//   { weights: { bio: 10, hobbies: 5, skills: 1 } }
+// );
+// In this case, matches in the bio field will be given the highest priority.
 
 // {
 //     "name": "Michael Brown",

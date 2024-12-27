@@ -10,7 +10,6 @@ exports.doHash=(value,saltValue)=>{
 exports.doHashValidation=(value,hashedValue)=>{
     const result=bcrypt.compare(value,hashedValue);
     return result;
-
 }
 
 exports.hmacProcess=(value,key)=>{

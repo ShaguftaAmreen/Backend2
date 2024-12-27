@@ -6,8 +6,8 @@ const Item = require('./models/item');
 
 const app = express();
 
-// app.use(bodyParser.json());
-// app.use(cors());
+app.use(bodyParser.json());
+app.use(cors());
 
 mongoose
   .connect("mongodb://0.0.0.0:27017/crudapi")

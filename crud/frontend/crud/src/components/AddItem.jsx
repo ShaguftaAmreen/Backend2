@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AddItem = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ const AddItem = () => {
     price: 0,
   });
 
+  const navigate=useNavigate()
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,6 +22,7 @@ const AddItem = () => {
     try {
       const response = await axios.post('http://localhost:5000/items', formData);
       console.log('Item added successfully:', response.data);
+       navigate("/")
     } catch (error) {
       console.error('Error adding item:', error.message);
     }
@@ -50,7 +53,7 @@ const AddItem = () => {
           onChange={handleChange}
         />
         <button type='submit'>Add the item</button>
-      </form>
+    </form>
     </div>
   );
 };

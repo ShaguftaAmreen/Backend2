@@ -26,6 +26,8 @@ mongoose
     console.log(err);
   });
 
+/***********************************************************************/
+
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -49,7 +51,7 @@ app.post("/login", async (req, res) => {
         const accessToken = jwt.sign(
           { email: email },
           "jwt-access-token-secret-key",
-          { expiresIn: "1m" }
+          { expiresIn: "1m" },
         );
         const refreshToken = jwt.sign(
           { email: email },
