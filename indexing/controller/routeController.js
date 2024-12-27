@@ -101,34 +101,37 @@ exports.getOneStudent = async (req, res) => {
 
     if (students.length === 0) {
       students = await Student.aggregate([
-        { $unwind: "$hobbies" }, 
-        { $match: { hobbies: { $regex: searchQuery, $options: "i" } } }, 
+        { $unwind: "$hobbies"?"$hobbies":"$skills"}, 
+        { $match:{$or:[{ hobbies: { $regex: searchQuery, $options: "i" } },
+                         { skills: { $regex: searchQuery, $options: "i" } }]}} , 
         { $sort: { name: 1 } }, 
       ]);
     }
 
-    if (students.length === 0) {
-      students = await Student.aggregate([
-        { $unwind: "$skills" }, 
-        { $match: { skills: { $regex: searchQuery, $options: "i" } } }, 
-        { $sort: { name: 1 } }, 
-      ]);
-    }
+
+    // if (students.length === 0) {
+    //   students = await Student.aggregate([
+    //     { $unwind: "$skills" }, 
+    //     { $match: { skills: { $regex: searchQuery, $options: "i" } } }, 
+    //     { $sort: { name: 1 } }, 
+    //   ]);
+    // }
   
-      if (students.length > 0) {
-        if(students.length===1){
+      if (students.length > 0 ) {
+        // if(students.length===1){
         res.status(200).json({
           success: true,
-          message: "Student found.",
+          message: (students.length===1) ? "Student found" : "Students found" ,
           students,
-        }); }
-        else{
-            res.status(200).json({
-                success: true,
-                message: "Students found.",
-                students,
-              }); 
-        }
+        });
+      //  }
+        // else{
+        //     res.status(200).json({
+        //         success: true,
+        //         message: "Students found.",
+        //         students,
+        //       }); 
+        // }
       } 
       else {
         res.status(404).json({
