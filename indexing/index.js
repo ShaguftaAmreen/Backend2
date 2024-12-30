@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const studentRoutes=require("./routes/studentRoutes")
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -29,7 +30,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello from the server." });
 });
 
-
+app.use(errorHandler);
   
 const PORT = 5000;
 app.listen(PORT, () => {

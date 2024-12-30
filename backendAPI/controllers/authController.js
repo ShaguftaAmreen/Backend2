@@ -83,7 +83,7 @@ Here’s why .select('+password') is needed:*/
     const token = jwt.sign(
       {
         userId: existingUser._id,
-        email: existingUser.verified,
+        email: existingUser.email,
         verified: existingUser.verified,
       },
       process.env.TOKEN_SECRET,
@@ -300,7 +300,6 @@ exports.changePassword = async (req, res) => {
 };
 
 /**********************************************************************/
-////////////////////////////////////////////
 
 exports.sendForgotPasswordCode = async (req, res) => {
   const { email } = req.body;

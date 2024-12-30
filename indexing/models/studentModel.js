@@ -21,6 +21,7 @@ const studentSchema = new mongoose.Schema({
   bio: { type: String },
 });
 
+
 //studentSchema.index({ age: 1 });
 
 studentSchema.index({ bio: "text", hobbies: "text", skills: "text" });
@@ -57,3 +58,17 @@ module.exports = mongoose.model("Student", studentSchema);
 //       }
 //     ]
 //   }
+
+
+// const mongoose = require("mongoose");
+
+// const userSchema = new mongoose.Schema({
+//   name: { type: String, required: true },
+//   email: { type: String, required: true },
+//   bestFriend: { type: mongoose.SchemaTypes.ObjectId, ref: "User" }, // Refers to another User document
+// });
+
+// const User = mongoose.model("User", userSchema);
+
+// module.exports = User;
+

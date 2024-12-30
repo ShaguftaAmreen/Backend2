@@ -5,7 +5,7 @@ exports.addStudent = async (req, res) => {
 
   try {
     
-    if (!name || !age || !email || !phoneNumber || !address || !hobbies || !experience) {
+    if (!name || !age || !email || !phoneNumber || !address || !hobbies || !experience){
       return res
         .status(400)
         .json({ success: false, message: "All required fields must be provided" });
@@ -39,47 +39,47 @@ exports.addStudent = async (req, res) => {
       result,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
+    next(error); 
+}
 };
 
 /*****************************************************************************/
 
-exports.getOneStudent = async (req, res) => {
-    try {
+exports.getOneStudent = async (req, res, next) => {
+  try {
       const { city, age } = req.body;
-  
-      if (!city || !age) {
-        return res.status(400).json({
-          success: false,
-          message: "City and age are required to fetch the student.",
-        });
-      }
-  
-      const student = await Student.findOne({
-        $and: [{ "address.city": city }, { age: age }],
-      });
-  
-      if (student) {
-        res.status(200).json({
-          success: true,
-          message: `Student found in ${city} with age ${age} and name ${student.name}.`,
-          student,
-        });
-      } else {
-        res.status(404).json({
-          success: false,
-          message: `No student found in ${city} with age ${age}.`,
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: "Internal server error" });
-    }
-  };
 
-  /***********************************************************************************/
+      if (!city || !age) {
+          return res.status(400).json({
+              success: false,
+              message: "City and age are required to fetch the student.",
+          });
+      }
+
+     // nonExistentFunction();
+
+      const student = await Student.findOne({
+          $and: [{ "address.city": city }, { age: age }],
+      });
+
+      if (student) {
+          res.status(200).json({
+              success: true,
+              message: `Student found in ${city} with age ${age} and name ${student.name}.`,
+              student,
+          });
+      } else {
+          res.status(404).json({
+              success: false,
+              message: `No student found in ${city} with age ${age}.`,
+          });
+      }
+  } catch (error) {
+      next(error); 
+  }
+};
+
+/***********************************************************************************/
   
   exports.searchStudents = async (req, res) => {
     try {
@@ -109,6 +109,7 @@ exports.getOneStudent = async (req, res) => {
     }
 
 
+
     // if (students.length === 0) {
     //   students = await Student.aggregate([
     //     { $unwind: "$skills" }, 
@@ -116,7 +117,8 @@ exports.getOneStudent = async (req, res) => {
     //     { $sort: { name: 1 } }, 
     //   ]);
     // }
-  
+
+
       if (students.length > 0 ) {
         // if(students.length===1){
         res.status(200).json({
@@ -140,9 +142,8 @@ exports.getOneStudent = async (req, res) => {
         });
       }
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: "Internal server error" });
-    }
+      next(error); 
+  }
   };
   
 
@@ -216,9 +217,8 @@ exports.setAge = async (req, res) => {
         });
       }
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: "Internal server error" });
-    }
+      next(error); 
+  }
   };
 
   /*********************************************************/
@@ -247,3 +247,5 @@ exports.setAge = async (req, res) => {
 //   ]);
 
 // 
+
+//employee.find({$text:{$search:"North"}})
